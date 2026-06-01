@@ -1,0 +1,32 @@
+[
+  {
+    "scenario": "Scenario 1: Noisy Neighbor (OS -> K8s -> App)",
+    "expected": "Noisy_Neighbor_OS_CPU_Exhaustion",
+    "baseline_pred": "App_HTTP_503_Spike",
+    "baseline_mttd": 12.0,
+    "pure_gnn_pred": "App_Failure_Cascade",
+    "pure_gnn_mttd": 2.5,
+    "stgnn_pred": "Noisy_Neighbor_OS_CPU_Exhaustion",
+    "stgnn_mttd": 1.8
+  },
+  {
+    "scenario": "Scenario 2: Edge Network Degradation (Mist -> App -> K8s)",
+    "expected": "Mist_AP_Packet_Loss",
+    "baseline_pred": "K8s_Ingress_High_Memory",
+    "baseline_mttd": 15.0,
+    "pure_gnn_pred": "K8s_Memory_Leak",
+    "pure_gnn_mttd": 2.2,
+    "stgnn_pred": "Mist_AP_Packet_Loss",
+    "stgnn_mttd": 1.5
+  },
+  {
+    "scenario": "Scenario 3: Database Deadlock (App -> OS Disk)",
+    "expected": "Database_Transaction_Deadlock",
+    "baseline_pred": "OS_Disk_Saturation",
+    "baseline_mttd": 9.5,
+    "pure_gnn_pred": "OS_Disk_Saturation",
+    "pure_gnn_mttd": 2.0,
+    "stgnn_pred": "Database_Transaction_Deadlock",
+    "stgnn_mttd": 2.1
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "scenario": "Scenario 1: K8s Pod Crash (Single Layer)",
+    "expected": "K8s_Pod_CrashLoopBackOff",
+    "baseline_pred": "K8s_Pod_CrashLoopBackOff",
+    "baseline_mttd": 6.5,
+    "pure_gnn_pred": "K8s_Pod_CrashLoopBackOff",
+    "pure_gnn_mttd": 1.2,
+    "stgnn_pred": "K8s_Pod_CrashLoopBackOff",
+    "stgnn_mttd": 1.1
+  },
+  {
+    "scenario": "Scenario 2: OS CPU Saturation (Single Layer)",
+    "expected": "OS_CPU_Exhaustion",
+    "baseline_pred": "OS_CPU_Exhaustion",
+    "baseline_mttd": 8.0,
+    "pure_gnn_pred": "OS_CPU_Exhaustion",
+    "pure_gnn_mttd": 1.5,
+    "stgnn_pred": "OS_CPU_Exhaustion",
+    "stgnn_mttd": 1.2
+  },
+  {
+    "scenario": "Scenario 3: Cascading Network-to-App Degradation (Multi-Layer)",
+    "expected": "Mist_AP_Offline",
+    "baseline_pred": "App_Failure",
+    "baseline_mttd": 5.0,
+    "pure_gnn_pred": "App_Failure",
+    "pure_gnn_mttd": 1.1,
+    "stgnn_pred": "Mist_AP_Offline",
+    "stgnn_mttd": 1.5
+  }
+]

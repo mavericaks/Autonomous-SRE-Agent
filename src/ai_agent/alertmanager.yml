@@ -1,0 +1,20 @@
+global:
+  resolve_timeout: 5m
+  smtp_require_tls: true
+route:
+  receiver: ai-sre-agent
+  group_wait: 10s
+  group_interval: 5m
+  repeat_interval: 3h
+  routes:
+    - receiver: ai-sre-agent
+      matchers:
+        - severity=~"critical|warning"
+      continue: true
+receivers:
+  - name: ai-sre-agent
+    webhook_configs:
+      - url: 'http://10.10.10.10:9999/alert'
+        send_resolved: true
+templates:
+  - '/etc/prometheus/*.tmpl'

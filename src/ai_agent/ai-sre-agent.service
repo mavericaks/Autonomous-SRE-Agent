@@ -1,0 +1,16 @@
+[Unit]
+Description=AI SRE Agent - Autonomous Degradation Detection
+After=network.target docker.service
+
+[Service]
+Type=simple
+User=kolla
+Group=kolla
+WorkingDirectory=/opt/ai-sre-agent
+Environment=PATH=/opt/ai-sre-agent/venv/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/opt/ai-sre-agent/venv/bin/python /opt/ai-sre-agent/main.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,22 @@
+[
+  {
+    "scenario": "Scenario 1: Cascading OS CPU Saturation",
+    "expected": "OS_CPU_Exhaustion",
+    "baseline_pred": "OS_CPU_Exhaustion",
+    "baseline_mttd": 1.0055460929870605,
+    "pure_gnn_pred": "OS_CPU_Exhaustion",
+    "pure_gnn_mttd": 1.005558967590332,
+    "stgnn_pred": null,
+    "stgnn_mttd": 0
+  },
+  {
+    "scenario": "Scenario 2: K8s Pod Crash",
+    "expected": "K8s_Pod_CrashLoopBackOff",
+    "baseline_pred": "K8s_Pod_CrashLoopBackOff",
+    "baseline_mttd": 1.0055067539215088,
+    "pure_gnn_pred": "K8s_Pod_CrashLoopBackOff",
+    "pure_gnn_mttd": 1.0055184364318848,
+    "stgnn_pred": null,
+    "stgnn_mttd": 0
+  }
+]

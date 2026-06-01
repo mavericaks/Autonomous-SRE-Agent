@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: video-app-ui
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>AI-SRE Live Video Stream</title>
+        <style>
+            body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: #f8fafc; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
+            .header { text-align: center; margin-bottom: 20px; }
+            .header h1 { margin: 0; color: #38bdf8; font-size: 2.5rem; text-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
+            .header p { margin: 5px 0 0; color: #94a3b8; font-size: 1.1rem; }
+            .video-container { width: 90%; max-width: 900px; aspect-ratio: 16/9; background-color: #000; border: 1px solid #334155; border-radius: 12px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+            .live-badge { position: absolute; top: 20px; left: 20px; background: #ef4444; color: white; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; letter-spacing: 1px; animation: pulse 2s infinite; }
+            @keyframes pulse { 0% { opacity: 1; box-shadow: 0 0 10px #ef4444; } 50% { opacity: 0.5; box-shadow: none; } 100% { opacity: 1; box-shadow: 0 0 10px #ef4444; } }
+            .video-content { text-align: center; }
+            .spinner { width: 50px; height: 50px; border: 5px solid #1e293b; border-top: 5px solid #38bdf8; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px auto; }
+            @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+            .video-text { color: #64748b; font-size: 1.2rem; letter-spacing: 2px; }
+            .controls { width: 90%; max-width: 900px; display: flex; justify-content: space-between; margin-top: 20px; padding: 20px; background: #1e293b; border-radius: 12px; box-sizing: border-box; }
+            .stat { color: #cbd5e1; font-size: 1rem; }
+            .stat span { font-weight: bold; color: #10b981; margin-left: 5px; }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>AI-SRE Demonstration Platform</h1>
+            <p>Live Kubernetes Video Streaming Target</p>
+        </div>
+        <div class="video-container">
+            <div class="live-badge">LIVE</div>
+            <div class="video-content">
+                <div class="spinner"></div>
+                <div class="video-text">AWAITING VIDEO FEED...</div>
+            </div>
+        </div>
+        <div class="controls">
+            <div class="stat">Status: <span>Optimal</span></div>
+            <div class="stat">Resolution: <span>1080p60</span></div>
+            <div class="stat">Latency: <span>2.4 ms</span></div>
+            <div class="stat">Backend: <span>Kubernetes</span></div>
+        </div>
+    </body>
+    </html>
