@@ -2,10 +2,22 @@ import paramiko
 import time
 import sys
 
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+BASE_DIR = os.getenv('BASE_DIR', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+CONTROLLER_IP = os.getenv('OPENSTACK_CONTROLLER_IP', '10.10.10.10')
+COMPUTE1_IP = os.getenv('OPENSTACK_COMPUTE1_IP', '10.10.10.11')
+COMPUTE2_IP = os.getenv('OPENSTACK_COMPUTE2_IP', '10.10.10.12')
+SSH_PASSWORD = os.getenv('SSH_PASSWORD', '123')
+
+
+
 def get_ssh_client(ip):
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect(ip, username='kolla', password='<REDACTED>', timeout=10)
+    ssh.connect(ip, username='kolla', password=SSH_PASSWORD, timeout=10)
     return ssh
 
 def run_cmd(ssh, cmd, sudo=False):
@@ -32,7 +44,7 @@ print("========================================")
 
 # --- FAULT 1: CPU Exhaustion ---
 print("\n[1/3] Injecting CPU Exhaustion Fault on Compute1 (10.10.10.11)...")
-ssh_compute1 = get_ssh_client('10.10.10.11')
+ssh_compute1 = get_ssh_client(COMPUTE1_IP)
 run_cmd(ssh_compute1, "sudo apt-get update && sudo apt-get install stress -y", sudo=True)
 # Run stress in background
 run_cmd(ssh_compute1, "nohup stress --cpu 6 --timeout 120 > /dev/null 2>&1 &", sudo=False)
@@ -50,7 +62,7 @@ time.sleep(15)
 
 # --- FAULT 2: Nova API Crash ---
 print("\n[2/3] Injecting OpenStack Nova API Failure on Controller (10.10.10.10)...")
-ssh_controller = get_ssh_client('10.10.10.10')
+ssh_controller = get_ssh_client(CONTROLLER_IP)
 run_cmd(ssh_controller, "sudo docker stop nova_api", sudo=True)
 
 print(">>> FAULT INJECTED! Please watch the OpenStack Services / Nova dashboard.")

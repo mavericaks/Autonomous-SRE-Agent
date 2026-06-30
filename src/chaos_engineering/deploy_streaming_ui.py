@@ -1,7 +1,19 @@
 import base64, subprocess, sys
 
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+BASE_DIR = os.getenv('BASE_DIR', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+CONTROLLER_IP = os.getenv('OPENSTACK_CONTROLLER_IP', '10.10.10.10')
+COMPUTE1_IP = os.getenv('OPENSTACK_COMPUTE1_IP', '10.10.10.11')
+COMPUTE2_IP = os.getenv('OPENSTACK_COMPUTE2_IP', '10.10.10.12')
+SSH_PASSWORD = os.getenv('SSH_PASSWORD', '123')
+
+
+
 # Read HTML
-with open(r"H:\Kolla-Ansible\src\chaos_engineering\streaming_index.html", "r", encoding="utf-8") as f:
+with open(os.path.join(BASE_DIR, "\src\chaos_engineering\streaming_index.html"), "r", encoding="utf-8") as f:
     html = f.read()
 
 b64 = base64.b64encode(html.encode()).decode()

@@ -19,7 +19,7 @@ except Exception as e:
 print("Connecting to Kolla controller...")
 ssh = paramiko.SSHClient()
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-ssh.connect('10.10.10.10', username='kolla', password='123')
+ssh.connect(CONTROLLER_IP, username='kolla', password=SSH_PASSWORD)
 
 print("Uploading to Kolla controller...")
 sftp = ssh.open_sftp()
@@ -32,6 +32,18 @@ ssh_inner = "echo '123' | sudo -S ip netns exec qrouter-1166407d-006b-4231-8187-
 ssh.exec_command(ssh_inner)
 
 import time
+
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+BASE_DIR = os.getenv('BASE_DIR', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+CONTROLLER_IP = os.getenv('OPENSTACK_CONTROLLER_IP', '10.10.10.10')
+COMPUTE1_IP = os.getenv('OPENSTACK_COMPUTE1_IP', '10.10.10.11')
+COMPUTE2_IP = os.getenv('OPENSTACK_COMPUTE2_IP', '10.10.10.12')
+SSH_PASSWORD = os.getenv('SSH_PASSWORD', '123')
+
+
 time.sleep(2)
 
 cmd_deploy_calico = "echo '123' | sudo -S ip netns exec qrouter-1166407d-006b-4231-8187-3ad4ac6fbb03 ssh -o StrictHostKeyChecking=no -i /home/kolla/.ssh/k8s_rsa ubuntu@172.16.0.74 'kubectl apply -f /tmp/calico.yaml'"

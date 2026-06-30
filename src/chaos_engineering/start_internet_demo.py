@@ -7,7 +7,19 @@ import urllib.request
 
 import os
 
-key_path = r"H:\Kolla-Ansible\src\chaos_engineering\k8s_rsa_local"
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+BASE_DIR = os.getenv('BASE_DIR', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+CONTROLLER_IP = os.getenv('OPENSTACK_CONTROLLER_IP', '10.10.10.10')
+COMPUTE1_IP = os.getenv('OPENSTACK_COMPUTE1_IP', '10.10.10.11')
+COMPUTE2_IP = os.getenv('OPENSTACK_COMPUTE2_IP', '10.10.10.12')
+SSH_PASSWORD = os.getenv('SSH_PASSWORD', '123')
+
+
+
+key_path = os.path.join(BASE_DIR, "\src\chaos_engineering\k8s_rsa_local")
 
 if not os.path.exists(key_path):
     print("[1] Fetching K8s SSH key from OpenStack host...")
@@ -77,7 +89,7 @@ def read_pinggy():
                 print(f"  INTERNET URL FOR MOBILE DEMO:", flush=True)
                 print(f"  {url}", flush=True)
                 print("=========================================================\n", flush=True)
-                with open(r"H:\Kolla-Ansible\src\chaos_engineering\pinggy_url.txt", "w") as f:
+                with open(os.path.join(BASE_DIR, "\src\chaos_engineering\pinggy_url.txt"), "w") as f:
                     f.write(url)
         
 t = threading.Thread(target=read_pinggy, daemon=True)

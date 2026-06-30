@@ -2,12 +2,24 @@ import paramiko
 import time
 import sys
 
-ip = '10.10.10.10'
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+BASE_DIR = os.getenv('BASE_DIR', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+CONTROLLER_IP = os.getenv('OPENSTACK_CONTROLLER_IP', '10.10.10.10')
+COMPUTE1_IP = os.getenv('OPENSTACK_COMPUTE1_IP', '10.10.10.11')
+COMPUTE2_IP = os.getenv('OPENSTACK_COMPUTE2_IP', '10.10.10.12')
+SSH_PASSWORD = os.getenv('SSH_PASSWORD', '123')
+
+
+
+ip = CONTROLLER_IP
 ssh = paramiko.SSHClient()
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 try:
     print(f"Connecting to {ip}...")
-    ssh.connect(ip, username='kolla', password='123', timeout=10)
+    ssh.connect(ip, username='kolla', password=SSH_PASSWORD, timeout=10)
     
     def run_cmd(cmd):
         print(f"Executing: {cmd}")

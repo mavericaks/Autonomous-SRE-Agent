@@ -2,10 +2,22 @@ import paramiko
 import time
 import base64
 
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+BASE_DIR = os.getenv('BASE_DIR', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+CONTROLLER_IP = os.getenv('OPENSTACK_CONTROLLER_IP', '10.10.10.10')
+COMPUTE1_IP = os.getenv('OPENSTACK_COMPUTE1_IP', '10.10.10.11')
+COMPUTE2_IP = os.getenv('OPENSTACK_COMPUTE2_IP', '10.10.10.12')
+SSH_PASSWORD = os.getenv('SSH_PASSWORD', '123')
+
+
+
 def run_on_controller(cmd, timeout=30):
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect('10.10.10.10', username='kolla', password='<REDACTED>', timeout=10)
+    ssh.connect(CONTROLLER_IP, username='kolla', password=SSH_PASSWORD, timeout=10)
     stdin, stdout, stderr = ssh.exec_command(cmd, timeout=timeout)
     out = stdout.read().decode('utf-8').strip()
     ssh.close()
@@ -23,7 +35,7 @@ def run_on_k8s_node(node_ip, cmd, timeout=90):
     # Now execute it
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect('10.10.10.10', username='kolla', password='<REDACTED>', timeout=10)
+    ssh.connect(CONTROLLER_IP, username='kolla', password=SSH_PASSWORD, timeout=10)
     channel = ssh.invoke_shell()
     time.sleep(1)
     channel.recv(9999)
@@ -47,7 +59,7 @@ def run_on_k8s_node(node_ip, cmd, timeout=90):
 
 print("Deploying UI via kubectl script...")
 
-with open(r"H:\Kolla-Ansible\kubernetes_management\video-ui.yaml", "r") as f:
+with open(os.path.join(BASE_DIR, "\kubernetes_management\video-ui.yaml"), "r") as f:
     yaml_content = f.read()
 
 b64_yaml = base64.b64encode(yaml_content.encode('utf-8')).decode('utf-8')

@@ -9,16 +9,28 @@ import http.server, socketserver
 from datetime import datetime
 os.environ['PYTHONUNBUFFERED'] = '1'
 
-sys.path.append(r"H:\Kolla-Ansible\data")
+sys.path.append(os.path.join(BASE_DIR, "\data"))
 from ml_models.stgnn_mathematical_critic import STGNNCritic
 
-LOG_FILE = r"H:\Kolla-Ansible\docs\Demo_OS_Disk_Fault_Execution_Log.md"
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+BASE_DIR = os.getenv('BASE_DIR', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+CONTROLLER_IP = os.getenv('OPENSTACK_CONTROLLER_IP', '10.10.10.10')
+COMPUTE1_IP = os.getenv('OPENSTACK_COMPUTE1_IP', '10.10.10.11')
+COMPUTE2_IP = os.getenv('OPENSTACK_COMPUTE2_IP', '10.10.10.12')
+SSH_PASSWORD = os.getenv('SSH_PASSWORD', '123')
+
+
+
+LOG_FILE = os.path.join(BASE_DIR, "\docs\Demo_OS_Disk_Fault_Execution_Log.md")
 CTRL_SSH = "ssh -o StrictHostKeyChecking=no kolla@10.10.10.10"
 COMPUTE_SSH = 'ssh -o StrictHostKeyChecking=no kolla@10.10.10.10 "ssh -o StrictHostKeyChecking=no kolla@10.10.10.11"'
 PROM_URL = "http://10.10.10.10:30010"
 PROM_AUTH = "admin:admin"
 APP_URL = "http://192.168.137.229:30080"
-COMPUTE = "10.10.10.11"
+COMPUTE = COMPUTE1_IP
 
 PROM_QUERIES = {
     "node_cpu_seconds_total": f"sum(node_cpu_seconds_total{{instance=~'{COMPUTE}.*'}})",
@@ -298,7 +310,7 @@ def main():
     log("")
     ui_data["status"] = "Healthy (Baseline)"
     ui_data["color"] = "#4ade80"
-    critic = STGNNCritic(model_dir=r"H:\Kolla-Ansible\data\ml_models\models")
+    critic = STGNNCritic(model_dir=os.path.join(BASE_DIR, "\data\ml_models\models"))
     log("[INIT] Model loaded. 65-feature topology across App/K8s/OS/Mist layers.")
     log(f"[INIT] Prometheus: {PROM_URL} | Compute target: {COMPUTE}")
 

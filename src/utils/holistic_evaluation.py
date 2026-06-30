@@ -4,7 +4,19 @@ import time
 from datetime import datetime
 import matplotlib.pyplot as plt
 
-LOG_DIR = r"H:\Kolla-Ansible\docs\Evaluation_Logs"
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+BASE_DIR = os.getenv('BASE_DIR', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+CONTROLLER_IP = os.getenv('OPENSTACK_CONTROLLER_IP', '10.10.10.10')
+COMPUTE1_IP = os.getenv('OPENSTACK_COMPUTE1_IP', '10.10.10.11')
+COMPUTE2_IP = os.getenv('OPENSTACK_COMPUTE2_IP', '10.10.10.12')
+SSH_PASSWORD = os.getenv('SSH_PASSWORD', '123')
+
+
+
+LOG_DIR = os.path.join(BASE_DIR, "\docs\Evaluation_Logs")
 os.makedirs(LOG_DIR, exist_ok=True)
 run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
 RESULTS_FILE = os.path.join(LOG_DIR, f"holistic_results_{run_id}.json")

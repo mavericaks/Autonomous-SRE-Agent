@@ -1,15 +1,27 @@
 import paramiko
 import time
 
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+BASE_DIR = os.getenv('BASE_DIR', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+CONTROLLER_IP = os.getenv('OPENSTACK_CONTROLLER_IP', '10.10.10.10')
+COMPUTE1_IP = os.getenv('OPENSTACK_COMPUTE1_IP', '10.10.10.11')
+COMPUTE2_IP = os.getenv('OPENSTACK_COMPUTE2_IP', '10.10.10.12')
+SSH_PASSWORD = os.getenv('SSH_PASSWORD', '123')
+
+
+
 ssh = paramiko.SSHClient()
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-ssh.connect('10.10.10.10', username='kolla', password='<REDACTED>', timeout=10)
+ssh.connect(CONTROLLER_IP, username='kolla', password=SSH_PASSWORD, timeout=10)
 
 tests = [
     ("Internet", "ping -c 1 -W 3 8.8.8.8 && echo 'PASS' || echo 'FAIL'"),
     ("DNS Resolution", "host api.cerebras.ai 8.8.8.8 2>&1 | head -3"),
-    ("Cerebras API", "curl -s -w '\\nHTTP_STATUS:%{http_code}' --connect-timeout 8 https://api.cerebras.ai/v1/models 2>&1 | tail -2"),
-    ("Mist API", "curl -s -w '\\nHTTP_STATUS:%{http_code}' --connect-timeout 8 -H 'Authorization: Token <REDACTED_MIST_TOKEN>' https://api.gc4.mist.com/api/v1/self 2>&1 | tail -2"),
+    ("Cerebras API", "curl -s -w '/nHTTP_STATUS:%{http_code}' --connect-timeout 8 https://api.cerebras.ai/v1/models 2>&1 | tail -2"),
+    ("Mist API", "curl -s -w '/nHTTP_STATUS:%{http_code}' --connect-timeout 8 -H 'Authorization: Token <REDACTED_MIST_TOKEN>' https://api.gc4.mist.com/api/v1/self 2>&1 | tail -2"),
     ("AI Agent Health", "curl -s http://localhost:9999/health"),
     ("K8s via qrouter", "source /etc/kolla/admin-openrc.sh && ROUTER_ID=$(openstack router show router1 -c id -f value) && sudo ip netns exec qrouter-$ROUTER_ID ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -i ~/.ssh/k8s_rsa ubuntu@172.16.0.74 'kubectl get nodes' 2>&1"),
 ]
