@@ -130,6 +130,28 @@ kolla-ansible post-deploy -i ~/multinode -e ansible_become_password=<your-sudo-p
 Retrieve your `admin` password from `/etc/kolla/passwords.yml` under `keystone_admin_password`.
 Navigate to `http://10.10.10.200` to access the Horizon dashboard!
 
+### 7. Deploy Nested Kubernetes (Calico)
+With OpenStack running, the next step is to build the deeply nested Kubernetes cluster for the AI to monitor.
+```bash
+python src/chaos_engineering/deploy_calico.py
+```
+This automated script will tunnel through the OpenStack `qrouter` network namespaces, SSH into the nested VMs, and deploy a Calico-backed Kubernetes cluster autonomously.
+
+### 8. Start the Dual-Brain AI SRE Agent
+Finally, launch the AI! The agent requires a Python virtual environment to run its ST-GNN predictive models and the LangChain reasoning engine.
+```bash
+# 1. Create the virtual environment
+python3 -m venv ai-venv
+source ai-venv/bin/activate
+
+# 2. Install ML and Agent dependencies
+pip install -r src/ai_agent/requirements.txt
+
+# 3. Launch the Agent
+python src/ai_agent/main.py
+```
+*The agent will immediately spin up a background thread, begin scraping Prometheus telemetry, pipe it into the ST-GNN for real-time inference, and stand ready to execute self-healing LangChain actions!*
+
 ---
 
 ## 🔒 Security Disclaimer
