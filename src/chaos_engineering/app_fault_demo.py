@@ -8,16 +8,16 @@ import time, os, sys, subprocess, json, urllib.parse
 from datetime import datetime
 os.environ['PYTHONUNBUFFERED'] = '1'
 
-sys.path.append(r"H:\Kolla-Ansible\data")
+sys.path.append(os.path.join(BASE_DIR, "\data"))
 from ml_models.stgnn_mathematical_critic import STGNNCritic
 
-LOG_FILE = r"H:\Kolla-Ansible\docs\Demo_App_Fault_Execution_Log.md"
+LOG_FILE = os.path.join(BASE_DIR, "\docs\Demo_App_Fault_Execution_Log.md")
 K8S_SSH = r"ssh -o StrictHostKeyChecking=no -i C:\Users\PowerX\.gemini\antigravity\scratch\k8s_rsa ubuntu@192.168.137.229"
 CTRL_SSH = "ssh -o StrictHostKeyChecking=no kolla@10.10.10.10"
 COMPUTE_SSH = f"{CTRL_SSH} ssh -o StrictHostKeyChecking=no kolla@10.10.10.11"
 PROM_URL = "http://10.10.10.200:9091"
 PROM_AUTH = "admin:VlgbNmcbQDvwXK7YBQil31sfEvQ1zN0WvUDwNfaI"
-COMPUTE = "10.10.10.11"
+COMPUTE = COMPUTE1_IP
 
 # 28 PromQL queries covering node_exporter + cAdvisor on the compute node
 PROM_QUERIES = {
@@ -92,6 +92,18 @@ def ssh(target, cmd):
 
 import base64
 
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+BASE_DIR = os.getenv('BASE_DIR', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+CONTROLLER_IP = os.getenv('OPENSTACK_CONTROLLER_IP', '10.10.10.10')
+COMPUTE1_IP = os.getenv('OPENSTACK_COMPUTE1_IP', '10.10.10.11')
+COMPUTE2_IP = os.getenv('OPENSTACK_COMPUTE2_IP', '10.10.10.12')
+SSH_PASSWORD = os.getenv('SSH_PASSWORD', '123')
+
+
+
 def k8s_run(cmd):
     """Run a kubectl command on the K8s master node safely using base64 via double-hop SSH."""
     b64_cmd = base64.b64encode(cmd.encode('utf-8')).decode('utf-8')
@@ -157,7 +169,7 @@ def main():
 
     section("PHASE 0: INITIALIZATION")
     log("[INIT] Loading ST-GNN Spatio-Temporal Model (GCNConv -> LSTM -> Linear)...")
-    critic = STGNNCritic(model_dir=r"H:\Kolla-Ansible\data\ml_models\models")
+    critic = STGNNCritic(model_dir=os.path.join(BASE_DIR, "\data\ml_models\models"))
     log("[INIT] Model loaded. 65-feature topology across App/K8s/OS/Mist layers.")
     log(f"[INIT] Prometheus: {PROM_URL} | Compute target: {COMPUTE}")
     log(f"[INIT] App endpoint: http://192.168.137.229:30080 (video-streaming-svc)")

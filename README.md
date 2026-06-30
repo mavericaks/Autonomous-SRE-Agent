@@ -60,6 +60,14 @@ This project introduces a **"Dual-Brain" Autonomous Site Reliability Engineer (S
 
 *The official OpenStack documentation is often insufficient for highly nested, multinode setups. Below is the definitive, battle-tested guide used to deploy this framework's infrastructure on Ubuntu 24.04 (OpenStack 2024.2 Dalmatian).*
 
+### Prerequisites & Configuration
+Before running any scripts, you must configure the environment variables to match your lab setup:
+1. Copy the example configuration file:
+   ```bash
+   cp .env.example .env
+   ```
+2. Open `.env` and fill in the actual IP addresses of your OpenStack nodes, your SSH passwords, and any required API keys (like `OPENAI_API_KEY`). All Python scripts dynamically load these values.
+
 ### Architecture Specs
 - **Controller Node** (`10.10.10.10`): 10GB RAM, 4 vCPUs
 - **Compute1 Node** (`10.10.10.11`): 16GB RAM, 6 vCPUs

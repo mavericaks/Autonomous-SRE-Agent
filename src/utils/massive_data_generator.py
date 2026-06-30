@@ -3,8 +3,20 @@ import random
 import os
 from datetime import datetime
 
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+BASE_DIR = os.getenv('BASE_DIR', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+CONTROLLER_IP = os.getenv('OPENSTACK_CONTROLLER_IP', '10.10.10.10')
+COMPUTE1_IP = os.getenv('OPENSTACK_COMPUTE1_IP', '10.10.10.11')
+COMPUTE2_IP = os.getenv('OPENSTACK_COMPUTE2_IP', '10.10.10.12')
+SSH_PASSWORD = os.getenv('SSH_PASSWORD', '123')
+
+
+
 NUM_RUNS = 1000
-RESULTS_FILE = r"H:\Kolla-Ansible\docs\Evaluation_Logs\massive_results.json"
+RESULTS_FILE = os.path.join(BASE_DIR, "\docs\Evaluation_Logs\massive_results.json")
 
 FAULT_TYPES = {
     "Mist_AP_Offline": {"layer": "Mist", "type": "Single"},

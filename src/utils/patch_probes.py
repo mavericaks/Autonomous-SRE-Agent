@@ -1,7 +1,7 @@
 import json
 import paramiko
 
-with open('h:\\Kolla-Ansible\\ds.json', 'r') as f:
+with open('h:/Kolla-Ansible/ds.json', 'r') as f:
     ds = json.load(f)
 
 for container in ds['spec']['template']['spec']['containers']:
@@ -16,16 +16,16 @@ for container in ds['spec']['template']['spec']['containers']:
             if '-bird-ready' in cmd:
                 cmd.remove('-bird-ready')
 
-with open('h:\\Kolla-Ansible\\ds_modified.json', 'w') as f:
+with open('h:/Kolla-Ansible/ds_modified.json', 'w') as f:
     json.dump(ds, f)
 
 def run_on_controller():
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect('10.10.10.10', username='kolla', password='<REDACTED>')
+    ssh.connect(CONTROLLER_IP, username='kolla', password=SSH_PASSWORD)
     
     sftp = ssh.open_sftp()
-    sftp.put('h:\\Kolla-Ansible\\ds_modified.json', '/tmp/ds_modified.json')
+    sftp.put('h:/Kolla-Ansible/ds_modified.json', '/tmp/ds_modified.json')
     sftp.close()
     
     cmd = "ssh -o StrictHostKeyChecking=no -i ~/.ssh/k8s_rsa ubuntu@192.168.137.229 \"cat > /tmp/ds_modified.json\" < /tmp/ds_modified.json"
@@ -39,4 +39,16 @@ def run_on_controller():
     ssh.close()
 
 import time
+
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+BASE_DIR = os.getenv('BASE_DIR', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+CONTROLLER_IP = os.getenv('OPENSTACK_CONTROLLER_IP', '10.10.10.10')
+COMPUTE1_IP = os.getenv('OPENSTACK_COMPUTE1_IP', '10.10.10.11')
+COMPUTE2_IP = os.getenv('OPENSTACK_COMPUTE2_IP', '10.10.10.12')
+SSH_PASSWORD = os.getenv('SSH_PASSWORD', '123')
+
+
 run_on_controller()

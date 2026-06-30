@@ -12,22 +12,34 @@ from dotenv import load_dotenv
 os.environ['PYTHONUNBUFFERED'] = '1'
 
 # Load Mist API environment
-ENV_PATH = r"H:\Kolla-Ansible\ai-agent\.env"
+ENV_PATH = os.path.join(BASE_DIR, "\ai-agent\.env")
 load_dotenv(ENV_PATH)
 MIST_SITE_ID = os.getenv("MIST_SITE_ID")
 MIST_TOKEN = os.getenv("MIST_API_TOKEN")
 MIST_HEADERS = {"Authorization": f"Token {MIST_TOKEN}", "Content-Type": "application/json"}
 
 # Add paths for GNN
-sys.path.append(r"H:\Kolla-Ansible\data")
+sys.path.append(os.path.join(BASE_DIR, "\data"))
 from ml_models.stgnn_mathematical_critic import STGNNCritic
 
-LOG_FILE = r"H:\Kolla-Ansible\docs\Demo_Execution_Log.md"
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+BASE_DIR = os.getenv('BASE_DIR', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+CONTROLLER_IP = os.getenv('OPENSTACK_CONTROLLER_IP', '10.10.10.10')
+COMPUTE1_IP = os.getenv('OPENSTACK_COMPUTE1_IP', '10.10.10.11')
+COMPUTE2_IP = os.getenv('OPENSTACK_COMPUTE2_IP', '10.10.10.12')
+SSH_PASSWORD = os.getenv('SSH_PASSWORD', '123')
+
+
+
+LOG_FILE = os.path.join(BASE_DIR, "\docs\Demo_Execution_Log.md")
 K8S_SSH = r"ssh -o StrictHostKeyChecking=no -i C:\Users\PowerX\.gemini\antigravity\scratch\k8s_rsa ubuntu@192.168.137.229"
 CTRL_SSH = "ssh -o StrictHostKeyChecking=no kolla@10.10.10.10"
 PROM_URL = "http://10.10.10.200:9091"
 PROM_AUTH = "admin:VlgbNmcbQDvwXK7YBQil31sfEvQ1zN0WvUDwNfaI"
-COMPUTE = "10.10.10.11"
+COMPUTE = COMPUTE1_IP
 TARGET_AP_ID = "00000000-0000-0000-1000-04cdc092addc" # KLE_Juniper_Mist_AP2
 
 # 28 PromQL queries covering node_exporter + cAdvisor
@@ -192,7 +204,7 @@ def main():
 
     section("PHASE 0: INITIALIZATION")
     log("[INIT] Loading ST-GNN Spatio-Temporal Model (14-class RCA)...")
-    critic = STGNNCritic(model_dir=r"H:\Kolla-Ansible\data\ml_models\models")
+    critic = STGNNCritic(model_dir=os.path.join(BASE_DIR, "\data\ml_models\models"))
     log("[INIT] Model loaded. 65-feature topology across App/K8s/OS/Mist layers.")
     log(f"[INIT] Mist API: gc4.mist.com | Target AP: {TARGET_AP_ID}")
 

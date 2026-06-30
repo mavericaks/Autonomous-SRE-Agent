@@ -1,8 +1,20 @@
 import paramiko, base64, time, re
 
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+BASE_DIR = os.getenv('BASE_DIR', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+CONTROLLER_IP = os.getenv('OPENSTACK_CONTROLLER_IP', '10.10.10.10')
+COMPUTE1_IP = os.getenv('OPENSTACK_COMPUTE1_IP', '10.10.10.11')
+COMPUTE2_IP = os.getenv('OPENSTACK_COMPUTE2_IP', '10.10.10.12')
+SSH_PASSWORD = os.getenv('SSH_PASSWORD', '123')
+
+
+
 ssh = paramiko.SSHClient()
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-ssh.connect('10.10.10.10', username='kolla', password='123')
+ssh.connect(CONTROLLER_IP, username='kolla', password=SSH_PASSWORD)
 
 ssh_inner = "echo '123' | sudo -S ip netns exec qrouter-1166407d-006b-4231-8187-3ad4ac6fbb03"
 
@@ -38,7 +50,7 @@ print(out)
 
 # Extract join command
 join_cmd = ""
-for line in out.split('\\n'):
+for line in out.split('/n'):
     if "kubeadm join" in line or "--discovery-token-ca-cert-hash" in line:
         join_cmd += line.strip() + " "
 join_cmd = re.search(r'(kubeadm join .*?--discovery-token-ca-cert-hash sha256:[a-z0-9]+)', out, re.DOTALL)
@@ -47,7 +59,7 @@ if not join_cmd:
     print("Could not find join command!")
     exit(1)
 
-join_cmd_str = join_cmd.group(1).replace('\\n', '').replace('\\\\', '').replace('\t', ' ')
+join_cmd_str = join_cmd.group(1).replace('/n', '').replace('//', '').replace('\t', ' ')
 join_cmd_str = ' '.join(join_cmd_str.split())
 print("Join command:", join_cmd_str)
 

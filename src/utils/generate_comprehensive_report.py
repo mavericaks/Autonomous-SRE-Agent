@@ -6,7 +6,19 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics import confusion_matrix, precision_recall_fscore_support
 
-LOG_DIR = r"H:\Kolla-Ansible\docs\Evaluation_Logs"
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+BASE_DIR = os.getenv('BASE_DIR', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+CONTROLLER_IP = os.getenv('OPENSTACK_CONTROLLER_IP', '10.10.10.10')
+COMPUTE1_IP = os.getenv('OPENSTACK_COMPUTE1_IP', '10.10.10.11')
+COMPUTE2_IP = os.getenv('OPENSTACK_COMPUTE2_IP', '10.10.10.12')
+SSH_PASSWORD = os.getenv('SSH_PASSWORD', '123')
+
+
+
+LOG_DIR = os.path.join(BASE_DIR, "\docs\Evaluation_Logs")
 RESULTS_FILE = os.path.join(LOG_DIR, "massive_results.json")
 REPORT_FILE = r"C:\Users\PowerX\.gemini\antigravity-ide\brain\efe5c135-bd29-4c8e-a9ef-fd797809aae4\Comprehensive_Final_Report.md"
 
