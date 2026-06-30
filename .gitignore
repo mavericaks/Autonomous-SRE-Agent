@@ -42,3 +42,10 @@ etcd-v3.5.16-linux-amd64/
 
 # Other
 antigravity lost conversation/
+
+openstack-*/
+deployment/openstack-*/
+*.lck
+*.scoreboard
+*.vmsn
+*.flp
