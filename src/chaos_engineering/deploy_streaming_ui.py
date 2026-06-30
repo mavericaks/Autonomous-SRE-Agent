@@ -1,7 +1,7 @@
 import base64, subprocess, sys
 
 # Read HTML
-with open(r"H:\Kolla-Ansible\chaos_engineering\streaming_index.html", "r", encoding="utf-8") as f:
+with open(r"H:\Kolla-Ansible\src\chaos_engineering\streaming_index.html", "r", encoding="utf-8") as f:
     html = f.read()
 
 b64 = base64.b64encode(html.encode()).decode()

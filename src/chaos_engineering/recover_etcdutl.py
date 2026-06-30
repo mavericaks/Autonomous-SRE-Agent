@@ -8,14 +8,26 @@ ssh_inner = "echo '123' | sudo -S ip netns exec qrouter-1166407d-006b-4231-8187-
 
 script = """
 set -e
-CID=$(crictl ps -a --name etcd -q | head -n 1)
-crictl logs $CID | tail -n 50
+systemctl stop kubelet
+crictl stop $(crictl ps -a --name etcd -q) || true
+
+# Restore using etcdutl
+ctr -n k8s.io run --rm \
+    --mount type=bind,src=/var/lib/etcd,dst=/var/lib/etcd,options=rbind:rw \
+    registry.k8s.io/etcd:3.5.16-0 etcd-restore \
+    etcdutl snapshot restore /tmp/db.bak --data-dir /var/lib/etcd/new-member
+
+rm -rf /var/lib/etcd/member
+mv /var/lib/etcd/new-member /var/lib/etcd/member
+chown -R root:root /var/lib/etcd/member
+
+systemctl start kubelet
 """
 
 b64_script = base64.b64encode(script.encode('utf-8')).decode('utf-8')
 cmd = f"{ssh_inner} 'echo {b64_script} | base64 -d | sudo bash'"
 
-print("Fetching etcd logs...")
+print("Running etcdutl snapshot restore...")
 stdin, stdout, stderr = ssh.exec_command(cmd)
 
 print("STDOUT:")
@@ -24,3 +36,4 @@ print("STDERR:")
 print(stderr.read().decode('utf-8', 'ignore'))
 
 ssh.close()
+print("Done.")

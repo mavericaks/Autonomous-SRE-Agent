@@ -19,7 +19,7 @@ MIST_TOKEN = os.getenv("MIST_API_TOKEN")
 MIST_HEADERS = {"Authorization": f"Token {MIST_TOKEN}", "Content-Type": "application/json"}
 
 # Add paths for GNN
-sys.path.append(r"H:\Kolla-Ansible")
+sys.path.append(r"H:\Kolla-Ansible\data")
 from ml_models.stgnn_mathematical_critic import STGNNCritic
 
 LOG_FILE = r"H:\Kolla-Ansible\docs\Demo_Execution_Log.md"
@@ -192,7 +192,7 @@ def main():
 
     section("PHASE 0: INITIALIZATION")
     log("[INIT] Loading ST-GNN Spatio-Temporal Model (14-class RCA)...")
-    critic = STGNNCritic(model_dir=r"H:\Kolla-Ansible\ml_models\models")
+    critic = STGNNCritic(model_dir=r"H:\Kolla-Ansible\data\ml_models\models")
     log("[INIT] Model loaded. 65-feature topology across App/K8s/OS/Mist layers.")
     log(f"[INIT] Mist API: gc4.mist.com | Target AP: {TARGET_AP_ID}")
 

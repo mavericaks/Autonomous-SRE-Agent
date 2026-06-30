@@ -8,19 +8,13 @@ ssh_inner = "echo '123' | sudo -S ip netns exec qrouter-1166407d-006b-4231-8187-
 
 script = """
 set -e
-CID=$(crictl ps -a --name etcd -q | head -n 1)
-crictl logs $CID | tail -n 50
+sudo find /var/lib/etcd /etc/kubernetes /opt -name "*.bak*" -o -name "*snapshot*" 2>/dev/null
 """
 
 b64_script = base64.b64encode(script.encode('utf-8')).decode('utf-8')
 cmd = f"{ssh_inner} 'echo {b64_script} | base64 -d | sudo bash'"
 
-print("Fetching etcd logs...")
 stdin, stdout, stderr = ssh.exec_command(cmd)
-
 print("STDOUT:")
-print(stdout.read().decode('utf-8', 'ignore'))
-print("STDERR:")
-print(stderr.read().decode('utf-8', 'ignore'))
-
+print(stdout.read().decode('utf-8'))
 ssh.close()

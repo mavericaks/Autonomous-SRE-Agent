@@ -9,7 +9,7 @@ import http.server, socketserver
 from datetime import datetime
 os.environ['PYTHONUNBUFFERED'] = '1'
 
-sys.path.append(r"H:\Kolla-Ansible")
+sys.path.append(r"H:\Kolla-Ansible\data")
 from ml_models.stgnn_mathematical_critic import STGNNCritic
 
 LOG_FILE = r"H:\Kolla-Ansible\docs\Demo_OS_CPU_Fault_Execution_Log.md"
@@ -300,7 +300,7 @@ def main():
     log("")
     ui_data["status"] = "Healthy (Baseline)"
     ui_data["color"] = "#4ade80"
-    critic = STGNNCritic(model_dir=r"H:\Kolla-Ansible\ml_models\models")
+    critic = STGNNCritic(model_dir=r"H:\Kolla-Ansible\data\ml_models\models")
     log("[INIT] Model loaded. 65-feature topology across App/K8s/OS/Mist layers.")
     log(f"[INIT] Prometheus: {PROM_URL} | Compute target: {COMPUTE}")
     log(f"[INIT] App endpoint: http://192.168.137.229:30080 (video-streaming-svc)")

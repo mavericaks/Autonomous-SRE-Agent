@@ -13,7 +13,7 @@ for ip, ics_ip in nodes.items():
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     try:
-        ssh.connect(ip, username='kolla', password='<REDACTED>', timeout=10)
+        ssh.connect(ip, username='kolla', password='123', timeout=10)
         
         cmds = [
             'sudo ip link set br-ex up',
@@ -25,8 +25,7 @@ for ip, ics_ip in nodes.items():
         
         for c in cmds:
             stdin, stdout, stderr = ssh.exec_command(c, get_pty=True)
-            stdin.write('<REDACTED>
-')
+            stdin.write('123\n')
             stdin.flush()
             time.sleep(0.5)
             
@@ -42,14 +41,12 @@ for ip, ics_ip in nodes.items():
             print("Starting port forward on controller...")
             # We copy the port-forward commands. 
             stdin, stdout, stderr = ssh.exec_command('nohup kubectl port-forward -n monitoring svc/prometheus-grafana 3000:80 --address 0.0.0.0 > /tmp/grafana-pf.log 2>&1 &', get_pty=True)
-            stdin.write('<REDACTED>
-')
+            stdin.write('123\n')
             stdin.flush()
             time.sleep(1)
             
             stdin, stdout, stderr = ssh.exec_command('nohup kubectl port-forward -n monitoring svc/prometheus-kube-prometheus-prometheus 9090:9090 --address 0.0.0.0 > /tmp/prom-pf.log 2>&1 &', get_pty=True)
-            stdin.write('<REDACTED>
-')
+            stdin.write('123\n')
             stdin.flush()
             time.sleep(1)
             

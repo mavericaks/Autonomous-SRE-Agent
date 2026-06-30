@@ -33,6 +33,8 @@ from langchain_core.tools import tool
 import httpx
 import requests
 
+from stgnn_mathematical_critic import STGNNCritic
+
 load_dotenv()
 
 # ---------------------------------------------------------------------------
@@ -429,6 +431,9 @@ When you receive an alert:
    - Edge remediation: run_kubectl_command
 5. **VERIFY**: Re-check metrics/status to confirm the fix worked.
 
+## Preemptive ST-GNN Alerts
+If you receive a "PREEMPTIVE ST-GNN ALERT", it means the AI model has forecasted an impending failure with high probability based on telemetry trends. Your job is to PROACTIVELY migrate workloads, throttle noise, or restart components *before* the system crashes. Do not wait for the failure to happen. Act immediately based on the forecast.
+
 ## Important Rules
 - Always investigate BEFORE acting. Never blindly restart services or devices.
 - For OpenStack operations, use run_openstack_command.
@@ -595,6 +600,20 @@ async def startup():
     logger.info(f"Provider chain: {' → '.join(PROVIDER_CHAIN)}")
     logger.info(f"Reasoning escalation: {REASONING_PROVIDER}")
     logger.info("AI SRE Agent ready and listening for alerts.")
+    
+    # Initialize ST-GNN Critic
+    try:
+        global stgnn_critic
+        stgnn_critic = STGNNCritic()
+        logger.info("ST-GNN Critic loaded successfully.")
+    except Exception as e:
+        logger.error(f"Failed to load ST-GNN Critic: {e}")
+        stgnn_critic = None
+
+    # Start proactive ST-GNN poller in background thread
+    stgnn_poller = threading.Thread(target=proactive_telemetry_poller, daemon=True)
+    stgnn_poller.start()
+
     # Start K8s alert poller in background thread
     poller = threading.Thread(target=k8s_alert_poller, daemon=True)
     poller.start()
@@ -606,6 +625,67 @@ async def startup():
         logger.info(f"Mist alarm poller started (interval={MIST_POLL_INTERVAL}s)")
     else:
         logger.info("Mist API not configured, skipping Mist poller.")
+
+
+def proactive_telemetry_poller():
+    """Background thread that continuously polls basic telemetry, 
+    feeds it to the ST-GNN, and proactively triggers the AI agent if 
+    a failure is predicted with high probability."""
+    import time
+    PROACTIVE_THRESHOLD = 0.70
+    while True:
+        time.sleep(15)
+        try:
+            if stgnn_critic is None:
+                continue
+
+            # Simulate gathering telemetry (In a real deployment, query Prometheus here)
+            # For this MVP, we query Prometheus for a few basic metrics
+            import requests
+            cpu_resp = requests.get(f"{OPENSTACK_PROMETHEUS_URL}/api/v1/query", params={"query": "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode='idle'}[1m])) * 100)"})
+            cpu_val = 0.0
+            if cpu_resp.status_code == 200 and cpu_resp.json().get('data', {}).get('result'):
+                cpu_val = float(cpu_resp.json()['data']['result'][0]['value'][1])
+
+            mem_resp = requests.get(f"{OPENSTACK_PROMETHEUS_URL}/api/v1/query", params={"query": "(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / 1024 / 1024"})
+            mem_val = 0.0
+            if mem_resp.status_code == 200 and mem_resp.json().get('data', {}).get('result'):
+                mem_val = float(mem_resp.json()['data']['result'][0]['value'][1])
+                
+            telemetry_snapshot = {
+                "os_cpu_util_percentage": cpu_val,
+                "os_memory_usage_mb": mem_val,
+                "app_request_latency_ms": 150.0  # Placeholder unless we query the app metric
+            }
+            
+            stgnn_critic.ingest_telemetry(telemetry_snapshot)
+            predictions = stgnn_critic.evaluate()
+            top_pred = predictions[0]
+            
+            if top_pred['probability'] >= PROACTIVE_THRESHOLD and top_pred['fault'] != "Normal":
+                logger.warning(f"[ST-GNN] PREEMPTIVE ALERT: {top_pred['fault']} at {top_pred['probability']*100:.2f}% probability!")
+                
+                alert_text = (
+                    f"PREEMPTIVE ST-GNN ALERT\n"
+                    f"The mathematical ST-GNN Critic model has forecasted an impending failure.\n"
+                    f"Predicted Fault: {top_pred['fault']}\n"
+                    f"Probability: {top_pred['probability']*100:.2f}%\n"
+                    f"Current Telemetry Sample: CPU={cpu_val:.1f}%, Mem={mem_val:.1f}MB\n"
+                    f"Take proactive action to resolve this before a hard failure occurs."
+                )
+                try:
+                    # Dispatch to agent
+                    result = smart_invoke(alert_text)
+                    log_incident(
+                        alert={"preemptive_alert": top_pred['fault'], "prob": top_pred['probability']},
+                        analysis=result.get("output", "No output"),
+                        actions="Preemptive action taken."
+                    )
+                except Exception as e:
+                    logger.error(f"[ST-GNN Poller] Agent failed on preemptive alert: {e}")
+                    
+        except Exception as e:
+            logger.debug(f"[ST-GNN Poller] Cycle error: {e}")
 
 
 def k8s_alert_poller():

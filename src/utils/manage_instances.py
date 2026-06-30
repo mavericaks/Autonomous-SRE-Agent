@@ -7,7 +7,7 @@ ssh = paramiko.SSHClient()
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 try:
     print(f"Connecting to {ip}...")
-    ssh.connect(ip, username='kolla', password='<REDACTED>', timeout=10)
+    ssh.connect(ip, username='kolla', password='123', timeout=10)
     
     def run_cmd(cmd):
         print(f"Executing: {cmd}")

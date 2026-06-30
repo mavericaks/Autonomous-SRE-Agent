@@ -13,7 +13,7 @@ import sys
 import os
 
 # Add ml_models to path to import the ST-GNN Mathematical Critic
-sys.path.append(r"H:\Kolla-Ansible\ml_models")
+sys.path.append(r"H:\Kolla-Ansible\data\ml_models")
 from stgnn_mathematical_critic import STGNNCritic
 
 sys.stdout.reconfigure(encoding='utf-8', line_buffering=True)

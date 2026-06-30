@@ -8,14 +8,15 @@ ssh_inner = "echo '123' | sudo -S ip netns exec qrouter-1166407d-006b-4231-8187-
 
 script = """
 set -e
-CID=$(crictl ps -a --name etcd -q | head -n 1)
-crictl logs $CID | tail -n 50
+sudo mv /var/lib/etcd/new-member/member /var/lib/etcd/member
+sudo chown -R root:root /var/lib/etcd/member
+sudo systemctl restart containerd kubelet
 """
 
 b64_script = base64.b64encode(script.encode('utf-8')).decode('utf-8')
 cmd = f"{ssh_inner} 'echo {b64_script} | base64 -d | sudo bash'"
 
-print("Fetching etcd logs...")
+print("Running manual move...")
 stdin, stdout, stderr = ssh.exec_command(cmd)
 
 print("STDOUT:")
@@ -24,3 +25,4 @@ print("STDERR:")
 print(stderr.read().decode('utf-8', 'ignore'))
 
 ssh.close()
+print("Done.")

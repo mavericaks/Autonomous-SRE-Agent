@@ -11,7 +11,7 @@ sudo mkdir -p $AGENT_DIR
 sudo chown kolla:kolla $AGENT_DIR
 
 # Copy agent files
-cp /tmp/ai-agent/* $AGENT_DIR/
+cp -r /tmp/ai-agent/* $AGENT_DIR/
 
 # Create Python virtual environment
 echo "[1/4] Creating Python virtual environment..."
