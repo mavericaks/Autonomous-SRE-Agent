@@ -60,13 +60,16 @@ This project introduces a **"Dual-Brain" Autonomous Site Reliability Engineer (S
 
 *The official OpenStack documentation is often insufficient for highly nested, multinode setups. Below is the definitive, battle-tested guide used to deploy this framework's infrastructure on Ubuntu 24.04 (OpenStack 2024.2 Dalmatian).*
 
-### Prerequisites & Configuration
-Before running any scripts, you must configure the environment variables to match your lab setup:
-1. Copy the example configuration file:
+### ⚡ 1-Click Infrastructure Setup (Recommended)
+This repository includes Infrastructure-as-Code via **Vagrant**. Instead of manually creating VMs, you can instantly spin up the entire 3-node OpenStack cluster:
+1. Install [Vagrant](https://developer.hashicorp.com/vagrant/downloads) and VirtualBox (or VMware).
+2. Run the following command in the repository root:
    ```bash
-   cp .env.example .env
+   vagrant up
    ```
-2. Open `.env` and fill in the actual IP addresses of your OpenStack nodes, your SSH passwords, and any required API keys (like `OPENAI_API_KEY`). All Python scripts dynamically load these values.
+This will automatically download Ubuntu 24.04, create the 3 VMs (`controller`, `compute1`, `compute2`), allocate the required massive RAM/CPUs, configure the dual-network adapters, and set up passwordless SSH. 
+
+---
 
 ### Architecture Specs
 - **Controller Node** (`10.10.10.10`): 10GB RAM, 4 vCPUs
@@ -126,6 +129,28 @@ kolla-ansible post-deploy -i ~/multinode -e ansible_become_password=<your-sudo-p
 ### 6. Verify Deployment
 Retrieve your `admin` password from `/etc/kolla/passwords.yml` under `keystone_admin_password`.
 Navigate to `http://10.10.10.200` to access the Horizon dashboard!
+
+### 7. Deploy Nested Kubernetes (Calico)
+With OpenStack running, the next step is to build the deeply nested Kubernetes cluster for the AI to monitor.
+```bash
+python src/chaos_engineering/deploy_calico.py
+```
+This automated script will tunnel through the OpenStack `qrouter` network namespaces, SSH into the nested VMs, and deploy a Calico-backed Kubernetes cluster autonomously.
+
+### 8. Start the Dual-Brain AI SRE Agent
+Finally, launch the AI! The agent requires a Python virtual environment to run its ST-GNN predictive models and the LangChain reasoning engine.
+```bash
+# 1. Create the virtual environment
+python3 -m venv ai-venv
+source ai-venv/bin/activate
+
+# 2. Install ML and Agent dependencies
+pip install -r src/ai_agent/requirements.txt
+
+# 3. Launch the Agent
+python src/ai_agent/main.py
+```
+*The agent will immediately spin up a background thread, begin scraping Prometheus telemetry, pipe it into the ST-GNN for real-time inference, and stand ready to execute self-healing LangChain actions!*
 
 ---
 
