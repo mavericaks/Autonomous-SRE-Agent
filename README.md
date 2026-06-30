@@ -60,6 +60,17 @@ This project introduces a **"Dual-Brain" Autonomous Site Reliability Engineer (S
 
 *The official OpenStack documentation is often insufficient for highly nested, multinode setups. Below is the definitive, battle-tested guide used to deploy this framework's infrastructure on Ubuntu 24.04 (OpenStack 2024.2 Dalmatian).*
 
+### ⚡ 1-Click Infrastructure Setup (Recommended)
+This repository includes Infrastructure-as-Code via **Vagrant**. Instead of manually creating VMs, you can instantly spin up the entire 3-node OpenStack cluster:
+1. Install [Vagrant](https://developer.hashicorp.com/vagrant/downloads) and VirtualBox (or VMware).
+2. Run the following command in the repository root:
+   ```bash
+   vagrant up
+   ```
+This will automatically download Ubuntu 24.04, create the 3 VMs (`controller`, `compute1`, `compute2`), allocate the required massive RAM/CPUs, configure the dual-network adapters, and set up passwordless SSH. 
+
+---
+
 ### Architecture Specs
 - **Controller Node** (`10.10.10.10`): 10GB RAM, 4 vCPUs
 - **Compute1 Node** (`10.10.10.11`): 16GB RAM, 6 vCPUs
