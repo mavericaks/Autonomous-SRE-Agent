@@ -4,6 +4,18 @@ import time
 import os
 from datetime import datetime, timezone
 
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+BASE_DIR = os.getenv('BASE_DIR', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+CONTROLLER_IP = os.getenv('OPENSTACK_CONTROLLER_IP', '10.10.10.10')
+COMPUTE1_IP = os.getenv('OPENSTACK_COMPUTE1_IP', '10.10.10.11')
+COMPUTE2_IP = os.getenv('OPENSTACK_COMPUTE2_IP', '10.10.10.12')
+SSH_PASSWORD = os.getenv('SSH_PASSWORD', '123')
+
+
+
 # Artifact path
 CSV_PATH = r"C:\Users\PowerX\.gemini\antigravity\brain\8a74dadb-06ba-4c57-895a-00a4700061ef\telemetry_dataset_5mins.csv"
 
@@ -18,7 +30,7 @@ for i in range(20):
         # 1. Connect to OpenStack Controller
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect('10.10.10.10', username='kolla', password='<REDACTED>', timeout=10)
+        ssh.connect(CONTROLLER_IP, username='kolla', password=SSH_PASSWORD, timeout=10)
 
         def run_cmd(cmd):
             stdin, stdout, stderr = ssh.exec_command(cmd)

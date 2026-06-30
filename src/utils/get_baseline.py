@@ -1,11 +1,23 @@
 #!/usr/bin/env python3
 import time, os, sys, subprocess, json, urllib.parse
 
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+BASE_DIR = os.getenv('BASE_DIR', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+CONTROLLER_IP = os.getenv('OPENSTACK_CONTROLLER_IP', '10.10.10.10')
+COMPUTE1_IP = os.getenv('OPENSTACK_COMPUTE1_IP', '10.10.10.11')
+COMPUTE2_IP = os.getenv('OPENSTACK_COMPUTE2_IP', '10.10.10.12')
+SSH_PASSWORD = os.getenv('SSH_PASSWORD', '123')
+
+
+
 PROM_SSH = "ssh -o StrictHostKeyChecking=no kolla@10.10.10.10"
 CTRL_SSH = "ssh -o StrictHostKeyChecking=no kolla@10.10.10.10"
 PROM_URL = "http://10.10.10.200:9091"
 PROM_AUTH = "admin:VlgbNmcbQDvwXK7YBQil31sfEvQ1zN0WvUDwNfaI"
-COMPUTE = "10.10.10.11"
+COMPUTE = COMPUTE1_IP
 
 PROM_QUERIES = {
     "node_cpu_seconds_total": f"sum(node_cpu_seconds_total{{instance=~'{COMPUTE}.*'}})",

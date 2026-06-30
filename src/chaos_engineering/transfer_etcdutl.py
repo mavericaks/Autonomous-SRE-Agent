@@ -1,6 +1,18 @@
 import paramiko, urllib.request, tarfile, os, base64
 import socket
 
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+BASE_DIR = os.getenv('BASE_DIR', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+CONTROLLER_IP = os.getenv('OPENSTACK_CONTROLLER_IP', '10.10.10.10')
+COMPUTE1_IP = os.getenv('OPENSTACK_COMPUTE1_IP', '10.10.10.11')
+COMPUTE2_IP = os.getenv('OPENSTACK_COMPUTE2_IP', '10.10.10.12')
+SSH_PASSWORD = os.getenv('SSH_PASSWORD', '123')
+
+
+
 orig_getaddrinfo = socket.getaddrinfo
 def new_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
     if host == 'github.com':
@@ -11,8 +23,8 @@ def new_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
 socket.getaddrinfo = new_getaddrinfo
 
 url = "https://github.com/etcd-io/etcd/releases/download/v3.5.16/etcd-v3.5.16-linux-amd64.tar.gz"
-tar_path = "H:\\Kolla-Ansible\\src\\chaos_engineering\\etcd.tar.gz"
-extract_dir = "H:\\Kolla-Ansible\\src\\chaos_engineering\\etcd_extracted"
+tar_path = os.path.join(BASE_DIR, "/src/chaos_engineering/etcd.tar.gz")
+extract_dir = os.path.join(BASE_DIR, "/src/chaos_engineering/etcd_extracted")
 
 print("Downloading etcd on Windows host...")
 urllib.request.urlretrieve(url, tar_path)
@@ -28,7 +40,7 @@ with tarfile.open(tar_path, "r:gz") as tar:
 print("Connecting to Kolla controller...")
 ssh = paramiko.SSHClient()
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-ssh.connect('10.10.10.10', username='kolla', password='123')
+ssh.connect(CONTROLLER_IP, username='kolla', password=SSH_PASSWORD)
 
 print("Transferring etcdutl to Kolla controller...")
 sftp = ssh.open_sftp()

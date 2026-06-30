@@ -1,9 +1,21 @@
 import paramiko
 import time
 
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+BASE_DIR = os.getenv('BASE_DIR', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+CONTROLLER_IP = os.getenv('OPENSTACK_CONTROLLER_IP', '10.10.10.10')
+COMPUTE1_IP = os.getenv('OPENSTACK_COMPUTE1_IP', '10.10.10.11')
+COMPUTE2_IP = os.getenv('OPENSTACK_COMPUTE2_IP', '10.10.10.12')
+SSH_PASSWORD = os.getenv('SSH_PASSWORD', '123')
+
+
+
 ssh = paramiko.SSHClient()
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-ssh.connect('10.10.10.10', username='kolla', password='<REDACTED>', timeout=10)
+ssh.connect(CONTROLLER_IP, username='kolla', password=SSH_PASSWORD, timeout=10)
 
 def fix_dns(node_ip):
     router_id = "1166407d-006b-4231-8187-3ad4ac6fbb03" # known from previous cmd
@@ -34,25 +46,25 @@ print(stdout.read().decode().strip())
 print("\n=== Configured Alertmanager to point to AI SRE agent ===")
 alert_cmd = (
     "sudo ip netns exec qrouter-1166407d-006b-4231-8187-3ad4ac6fbb03 ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -i ~/.ssh/k8s_rsa ubuntu@172.16.0.74 "
-    "'cat << \\\"EOF\\\" > alertmanager-config.yaml\n"
+    "'cat << /\"EOF/\" > alertmanager-config.yaml\n"
     "alertmanager:\n"
     "  config:\n"
     "    global:\n"
     "      resolve_timeout: 5m\n"
     "    route:\n"
-    "      group_by: [\\\"job\\\"]\n"
+    "      group_by: [/\"job/\"]\n"
     "      group_wait: 30s\n"
     "      group_interval: 5m\n"
     "      repeat_interval: 12h\n"
-    "      receiver: \\\"webhook\\\"\n"
+    "      receiver: /\"webhook/\"\n"
     "      routes:\n"
-    "      - receiver: \\\"webhook\\\"\n"
+    "      - receiver: /\"webhook/\"\n"
     "        matchers:\n"
-    "        - alertname = \\\"PodNotReady\\\"\n"
+    "        - alertname = /\"PodNotReady/\"\n"
     "    receivers:\n"
-    "    - name: \\\"webhook\\\"\n"
+    "    - name: /\"webhook/\"\n"
     "      webhook_configs:\n"
-    "      - url: \\\"http://172.16.0.1:9999/k8s-alert\\\"\n"
+    "      - url: /\"http://172.16.0.1:9999/k8s-alert/\"\n"
     "        send_resolved: true\n"
     "EOF\n"
     "export PATH=$PATH:/snap/bin;/snap/bin/helm upgrade prometheus-stack prometheus-community/kube-prometheus-stack --namespace monitoring -f alertmanager-config.yaml'"

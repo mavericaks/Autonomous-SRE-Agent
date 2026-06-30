@@ -13,8 +13,20 @@ import sys
 import os
 
 # Add ml_models to path to import the ST-GNN Mathematical Critic
-sys.path.append(r"H:\Kolla-Ansible\data\ml_models")
+sys.path.append(os.path.join(BASE_DIR, "\data\ml_models"))
 from stgnn_mathematical_critic import STGNNCritic
+
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+BASE_DIR = os.getenv('BASE_DIR', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+CONTROLLER_IP = os.getenv('OPENSTACK_CONTROLLER_IP', '10.10.10.10')
+COMPUTE1_IP = os.getenv('OPENSTACK_COMPUTE1_IP', '10.10.10.11')
+COMPUTE2_IP = os.getenv('OPENSTACK_COMPUTE2_IP', '10.10.10.12')
+SSH_PASSWORD = os.getenv('SSH_PASSWORD', '123')
+
+
 
 sys.stdout.reconfigure(encoding='utf-8', line_buffering=True)
 
@@ -26,8 +38,8 @@ except Exception as e:
     print(f"[WARN] Failed to load ST-GNN: {e}")
     GNN_ENABLED = False
 
-CONTROLLER = '10.10.10.10'
-COMPUTE1   = '10.10.10.11'
+CONTROLLER = CONTROLLER_IP
+COMPUTE1   = COMPUTE1_IP
 USER, PASS = 'kolla', '123'
 APP_URL    = 'http://10.10.10.10:30080' # NodePort for video stream (routed through controller)
 

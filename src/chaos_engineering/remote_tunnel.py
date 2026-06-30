@@ -27,7 +27,7 @@ if r.returncode != 0:
     print(f"Failed: {r.stderr}")
     sys.exit(1)
 
-key_path = r"H:\Kolla-Ansible\chaos_engineering\k8s_rsa_local"
+key_path = os.path.join(BASE_DIR, "\chaos_engineering\k8s_rsa_local")
 with open(key_path, "w", newline="\n") as f:
     f.write(r.stdout)
 print(f"  [OK] Key saved to {key_path}")
@@ -63,6 +63,18 @@ print("  [OK] Tunnel is running!")
 # Step 3: Test
 print("[3] Testing connection...")
 import urllib.request
+
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+BASE_DIR = os.getenv('BASE_DIR', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+CONTROLLER_IP = os.getenv('OPENSTACK_CONTROLLER_IP', '10.10.10.10')
+COMPUTE1_IP = os.getenv('OPENSTACK_COMPUTE1_IP', '10.10.10.11')
+COMPUTE2_IP = os.getenv('OPENSTACK_COMPUTE2_IP', '10.10.10.12')
+SSH_PASSWORD = os.getenv('SSH_PASSWORD', '123')
+
+
 try:
     resp = urllib.request.urlopen("http://localhost:8888/", timeout=10)
     print(f"  [OK] Video streaming accessible! Status: {resp.getcode()}")

@@ -2,7 +2,7 @@ import paramiko
 
 ssh = paramiko.SSHClient()
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-ssh.connect('10.10.10.10', username='kolla', password='<REDACTED>', timeout=10)
+ssh.connect(CONTROLLER_IP, username='kolla', password=SSH_PASSWORD, timeout=10)
 
 sftp = ssh.open_sftp()
 sftp.get('/opt/ai-sre-agent/main.py', 'main_tmp.py')
@@ -32,6 +32,18 @@ Format your FINAL response EXACTLY as follows (Do not deviate):
 # Or similar in the code.
 
 import re
+
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+BASE_DIR = os.getenv('BASE_DIR', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+CONTROLLER_IP = os.getenv('OPENSTACK_CONTROLLER_IP', '10.10.10.10')
+COMPUTE1_IP = os.getenv('OPENSTACK_COMPUTE1_IP', '10.10.10.11')
+COMPUTE2_IP = os.getenv('OPENSTACK_COMPUTE2_IP', '10.10.10.12')
+SSH_PASSWORD = os.getenv('SSH_PASSWORD', '123')
+
+
 
 # Find the prompt block in k8s_alert_poller
 content = re.sub(

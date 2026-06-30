@@ -8,6 +8,18 @@ import numpy as np
 import joblib
 from collections import deque
 
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+BASE_DIR = os.getenv('BASE_DIR', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+CONTROLLER_IP = os.getenv('OPENSTACK_CONTROLLER_IP', '10.10.10.10')
+COMPUTE1_IP = os.getenv('OPENSTACK_COMPUTE1_IP', '10.10.10.11')
+COMPUTE2_IP = os.getenv('OPENSTACK_COMPUTE2_IP', '10.10.10.12')
+SSH_PASSWORD = os.getenv('SSH_PASSWORD', '123')
+
+
+
 WINDOW_SIZE = 5
 
 class RCA_STGNN(nn.Module):
@@ -37,7 +49,7 @@ class RCA_STGNN(nn.Module):
         return F.softmax(logits, dim=1)
 
 class STGNNCritic:
-    def __init__(self, model_dir=r"H:\Kolla-Ansible\ml_models\models"):
+    def __init__(self, model_dir=os.path.join(BASE_DIR, "\ml_models\models")):
         self.device = torch.device('cpu')
         self.scaler = joblib.load(f"{model_dir}/scaler.pkl")
         self.label_encoder = joblib.load(f"{model_dir}/label_encoder.pkl")
@@ -126,7 +138,7 @@ if __name__ == "__main__":
         critic.ingest_telemetry(mem_leak_sim)
         print(f"Ingested Tick {i+1}...")
         
-    print("\\n=== ST-GNN MATHEMATICAL CRITIC OUTPUT ===")
+    print("/n=== ST-GNN MATHEMATICAL CRITIC OUTPUT ===")
     preds = critic.evaluate()
     for p in preds[:3]:
         print(f"[{p['probability']*100:.2f}%] -> {p['fault']}")

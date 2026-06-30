@@ -1,10 +1,22 @@
 import sys
-sys.path.append(r"H:\Kolla-Ansible")
+sys.path.append(os.path.join(BASE_DIR, ""))
 from ml_models.stgnn_mathematical_critic import STGNNCritic
 import csv
 
-critic = STGNNCritic(model_dir=r"H:\Kolla-Ansible\ml_models\models")
-rows = list(csv.DictReader(open(r"H:\Kolla-Ansible\datasets\telemetry_dataset_gnn_20k_cascading.csv")))
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+BASE_DIR = os.getenv('BASE_DIR', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+CONTROLLER_IP = os.getenv('OPENSTACK_CONTROLLER_IP', '10.10.10.10')
+COMPUTE1_IP = os.getenv('OPENSTACK_COMPUTE1_IP', '10.10.10.11')
+COMPUTE2_IP = os.getenv('OPENSTACK_COMPUTE2_IP', '10.10.10.12')
+SSH_PASSWORD = os.getenv('SSH_PASSWORD', '123')
+
+
+
+critic = STGNNCritic(model_dir=os.path.join(BASE_DIR, "\ml_models\models"))
+rows = list(csv.DictReader(open(os.path.join(BASE_DIR, "\datasets\telemetry_dataset_gnn_20k_cascading.csv"))))
 
 faults_to_test = ["OS_CPU_Exhaustion", "No_Fault", "K8s_Pod_CrashLoopBackOff",
                    "Mist_AP_Offline", "OS_Memory_Leak", "OS_Disk_IO_Saturation",

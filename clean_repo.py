@@ -1,6 +1,18 @@
 import os
 import re
 
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+BASE_DIR = os.getenv('BASE_DIR', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+CONTROLLER_IP = os.getenv('OPENSTACK_CONTROLLER_IP', '10.10.10.10')
+COMPUTE1_IP = os.getenv('OPENSTACK_COMPUTE1_IP', '10.10.10.11')
+COMPUTE2_IP = os.getenv('OPENSTACK_COMPUTE2_IP', '10.10.10.12')
+SSH_PASSWORD = os.getenv('SSH_PASSWORD', '123')
+
+
+
 TARGET_DIR = r"h:\Kolla-Ansible"
 
 # Secrets to scrub
@@ -10,14 +22,14 @@ SECRETS = {
     # OpenStack Password
     r"<REDACTED_OS_PASSWORD>": "<REDACTED_OS_PASSWORD>",
     # Hardcoded plain passwords
-    r"password='<REDACTED>'": "password='<REDACTED>'",
-    r"password='<REDACTED>'": "password='<REDACTED>'",
+    r"password=SSH_PASSWORD": "password=SSH_PASSWORD",
+    r"password=SSH_PASSWORD": "password=SSH_PASSWORD",
     r"password=\"123\"": "password=\"<REDACTED>\"",
     r"password=\"kolla\"": "password=\"<REDACTED>\"",
-    r"stdin.write\('123\\n'\)": "stdin.write('<REDACTED>\\n')",
-    r"stdin.write\(\"123\\n\"\)": "stdin.write(\"<REDACTED>\\n\")",
-    r"stdin.write\('kolla\\n'\)": "stdin.write('<REDACTED>\\n')",
-    r"stdin.write\(\"kolla\\n\"\)": "stdin.write(\"<REDACTED>\\n\")",
+    r"stdin.write\('123/n'\)": "stdin.write('<REDACTED>/n')",
+    r"stdin.write\(\"123/n\"\)": "stdin.write(\"<REDACTED>/n\")",
+    r"stdin.write\('kolla/n'\)": "stdin.write('<REDACTED>/n')",
+    r"stdin.write\(\"kolla/n\"\)": "stdin.write(\"<REDACTED>/n\")",
     # Specific command lines with passwords
     r"sudo -S.*?\n.*?123": "sudo -S ... <REDACTED>",
     # API key from Groq

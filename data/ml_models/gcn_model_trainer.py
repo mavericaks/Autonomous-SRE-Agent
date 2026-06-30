@@ -9,7 +9,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from imblearn.over_sampling import SMOTE
 
-DATASET_PATH = r"H:\Kolla-Ansible\datasets\telemetry_dataset_gnn_100k_cascading.csv"
+DATASET_PATH = os.path.join(BASE_DIR, "\datasets\telemetry_dataset_gnn_100k_cascading.csv")
 
 print("Loading 100k Dataset...")
 df = pd.read_csv(DATASET_PATH)
@@ -139,6 +139,18 @@ torch.save(model.state_dict(), "models/gnn_rca_model.pt")
 print("Model saved to models/gnn_rca_model.pt")
 
 import joblib
+
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+BASE_DIR = os.getenv('BASE_DIR', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+CONTROLLER_IP = os.getenv('OPENSTACK_CONTROLLER_IP', '10.10.10.10')
+COMPUTE1_IP = os.getenv('OPENSTACK_COMPUTE1_IP', '10.10.10.11')
+COMPUTE2_IP = os.getenv('OPENSTACK_COMPUTE2_IP', '10.10.10.12')
+SSH_PASSWORD = os.getenv('SSH_PASSWORD', '123')
+
+
 joblib.dump(scaler, "models/scaler.pkl")
 joblib.dump(label_encoder, "models/label_encoder.pkl")
 print("Scaler and Encoder saved.")
